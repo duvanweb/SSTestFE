@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TablesDinamicComponent } from './pages/tables-dinamic/tables-dinamic.component';
-import { TableComponent } from './pages/components/table/table.component';
 import { ListTablesComponent } from './pages/components/list-tables/list-tables.component';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,7 +16,6 @@ import { GridModule } from '@progress/kendo-angular-grid';
   declarations: [
     AppComponent,
     TablesDinamicComponent,
-    TableComponent,
     ListTablesComponent
   ],
   imports: [

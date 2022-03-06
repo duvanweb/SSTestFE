@@ -44,8 +44,8 @@ export class TablesDinamicComponent implements OnInit {
   }
 
   /**
-   *
-   * @param value
+   * Función que escucha el evento cuando cambia el tipo de tabla
+   * @param value {TableType}
    */
   onChangeSelected(value: TableType) {
     this.settingTablesService.getDetailTable(value.id).subscribe(result => {
@@ -55,13 +55,12 @@ export class TablesDinamicComponent implements OnInit {
   }
 
   /**
-   *
-   * @param id
+   * Función que trae la informacion del tipo de tabla seleccionada
+   * @param id { number } Es el codigo del tipo de tala
    */
   onGetDataTable (id: number) {
     this.tableDataService.getAll(id).subscribe(result => {
       this.dataTable = result;
-      console.log(this.dataTable)
     })
   }
 
@@ -72,61 +71,73 @@ export class TablesDinamicComponent implements OnInit {
    */
   onAddItemTable ({ sender } : any) {
     this.closeEditor(sender);
-    this.formGroup = new FormGroup(this.structureForm());
+    this.formGroup = new FormGroup(this.structureForm({}));
     sender.addRow(this.formGroup);
   }
 
   /**
-   *
+   * Función para editar un registro seleccionado
    * @param sender
-   * @param rowIndex
-   * @param dataItem
+   * @param rowIndex {number}
+   * @param dataItem {Object}
    */
   onEditItemTable ({ sender, rowIndex, dataItem }: any) {
-
+    this.closeEditor(sender);
+    this.formGroup = new FormGroup(this.structureForm(dataItem));
+    this.editedRowIndex = rowIndex;
+    sender.editRow(rowIndex, this.formGroup);
   }
 
   /**
-   *
+   * Función para cancelar un registro nuevo o editar
    * @param sender
-   * @param rowIndex
+   * @param rowIndex {number}
    */
   onCancelItemTable ({ sender, rowIndex }: any) {
-
+    this.closeEditor(sender, rowIndex);
   }
 
   /**
-   *
+   * Función para eliminar un registro de la tabla
    * @param dataItem
    */
   onRemoveItemTable ({ dataItem }: any) {
-
+    this.tableDataService.remove(this.settingTable.id, dataItem.id).subscribe(result => {
+      this.onGetDataTable(this.settingTable.id);
+    })
   }
 
   /**
-   *
+   * Función para guardar un registro nuevo o editar
    * @param sender
-   * @param rowIndex
-   * @param formGroup
-   * @param isNew
+   * @param rowIndex {number}
+   * @param formGroup {FormGroup}
+   * @param isNew {Boolean}
    */
-  onSaveItemTable ({ sender, rowIndex, formGroup, isNew }: any) {
+  onSaveItemTable ({ sender, rowIndex, formGroup, isNew, dataItem }: any) {
     const itemTable = formGroup.value;
-    console.log(this.settingTable)
-    this.tableDataService.create(this.settingTable.id, itemTable).subscribe(result => {
-      this.dataTable.push(result)
-    })
+    if (isNew) {
+      this.tableDataService.create(this.settingTable.id, itemTable).subscribe(result => {
+        this.onGetDataTable(this.settingTable.id);
+      })
+    } else {
+      this.tableDataService.update(this.settingTable.id, dataItem.id, itemTable).subscribe(result => {
+        this.onGetDataTable(this.settingTable.id);
+      })
+    }
     sender.closeRow(rowIndex);
   }
 
 
   /**
-   * Funcion para crear la estructura dinamica del formulario
+   * Función para crear la estructura dinamica del formulario
+   * @param data {Object}
+   * @private
    */
-  structureForm() {
+  private structureForm(data: any) {
     let formControl = Object();
     for (let column of this.settingTable.columns) {
-      formControl[column.header] = new FormControl();
+      formControl[column.header] = new FormControl(data[column.header]);
     }
     return  formControl;
   }
@@ -134,7 +145,7 @@ export class TablesDinamicComponent implements OnInit {
   /**
    *
    * @param grid
-   * @param rowIndex
+   * @param rowIndex {number}
    * @private
    */
   private closeEditor(grid: any , rowIndex = this.editedRowIndex) {

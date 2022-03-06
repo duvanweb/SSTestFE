@@ -29,15 +29,15 @@ export class ListTablesComponent implements OnInit {
         this.onChangeSelected(result[0])
         this.selectedTableType = result[0];
         this.listTableType = result;
-        // delete this.listTableType[0];
       }
     });
   }
 
 
-  /* Emitir al padres el tipo de tabla seleccionada
-  * @value { TableType } Objeto con el tipo de tabla seleccionada
-  */
+  /**
+   * Emitir al padre el tipo de tabla seleccionada
+   * @param value { TableType } Objeto con el tipo de tabla seleccionada
+   */
   onChangeSelected(value: TableType) {
     this.selectedChange.emit(value)
   }
