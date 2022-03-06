@@ -1,0 +1,25 @@
+<div class="!k-flex-row">
+
+  <!-- START COMPONENT LISTTABLES-->
+  <div class="!k-flex-col">
+    <app-list-tables (selectedChange)="onChangeSelected($event)"></app-list-tables>
+  </div>
+  <!-- END COMPONENT LISTTABLES-->
+
+  <!-- START TABLE DINAMIC-->
+  <div class="!k-flex-col">
+    <kendo-grid
+    >
+      <ng-template kendoGridToolbarTemplate>
+        <button kendoGridAddCommand>Add new</button>
+      </ng-template>
+        <kendo-grid-column *ngFor="let column of settingTable.columns"
+                           field="{{ column.header }}"
+                           title="{{ column.header }}"
+        ></kendo-grid-column>
+      <kendo-grid-command-column title="command" [width]="220">
+      </kendo-grid-command-column>
+    </kendo-grid>
+  </div>
+  <!-- END TABLE DINAMIC-->
+</div>
