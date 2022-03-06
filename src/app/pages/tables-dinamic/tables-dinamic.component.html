@@ -9,15 +9,31 @@
   <!-- START TABLE DINAMIC-->
   <div class="!k-flex-col">
     <kendo-grid
+      [data]="dataTable"
+      (add)="onAddItemTable($event)"
+      (edit)="onEditItemTable($event)"
+      (cancel)="onCancelItemTable($event)"
+      (save)="onSaveItemTable($event)"
+      (remove)="onRemoveItemTable($event)"
     >
       <ng-template kendoGridToolbarTemplate>
-        <button kendoGridAddCommand>Add new</button>
+        <button kendoGridAddCommand>Agregar</button>
       </ng-template>
         <kendo-grid-column *ngFor="let column of settingTable.columns"
                            field="{{ column.header }}"
                            title="{{ column.header }}"
         ></kendo-grid-column>
-      <kendo-grid-command-column title="command" [width]="220">
+      <kendo-grid-command-column title="Acciones" [width]="220">
+        <ng-template kendoGridCellTemplate let-isNew="isNew">
+          <button kendoGridEditCommand [primary]="true">Editar</button>
+          <button kendoGridRemoveCommand>Eliminar</button>
+          <button kendoGridSaveCommand >
+            {{ isNew ? "Guardar" : "Actualizar" }}
+          </button>
+          <button kendoGridCancelCommand>
+            {{ isNew ? "Cacelar" : "Cacelar" }}
+          </button>
+        </ng-template>
       </kendo-grid-command-column>
     </kendo-grid>
   </div>

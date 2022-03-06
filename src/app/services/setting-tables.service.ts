@@ -22,7 +22,7 @@ export class SettingTablesService {
   /*
   * Obtener la configuración de la tabla seleccionada
   *  @id {number} Debe ser el id del tipo de tabla seleccionada
-   */
+  */
   getDetailTable(id: number) {
     return this.http.get<TableDetail>(`${this.apiUrl}/getTableDetail/${id}`);
   }
