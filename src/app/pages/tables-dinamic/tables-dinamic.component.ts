@@ -27,8 +27,11 @@ export class TablesDinamicComponent implements OnInit {
     ]
   }
   public dataTable: object[] = [{}];
-  public formGroup: FormGroup | undefined = undefined;
+  public formGroup: FormGroup = new FormGroup(this.structureForm({}));
   private editedRowIndex: number | undefined = undefined;
+  public actionsDisabled: boolean = false ;
+  public dialogOpened = false;
+  private dataItem = { id: 0 }
 
   /**
    *
@@ -44,13 +47,29 @@ export class TablesDinamicComponent implements OnInit {
   }
 
   /**
+   * Función abrir dialogo
+   */
+  public onCloseDialog() {
+    this.dialogOpened = false;
+  }
+
+  /**
+   * Función cerrar dialogo
+   * @param dataItem
+   */
+  public onOpenDialog({ dataItem }: any) {
+    this.dialogOpened =  true;
+    this.dataItem = dataItem;
+  }
+
+  /**
    * Función que escucha el evento cuando cambia el tipo de tabla
    * @param value {TableType}
    */
   onChangeSelected(value: TableType) {
     this.settingTablesService.getDetailTable(value.id).subscribe(result => {
-      this.settingTable = result
-      this.onGetDataTable(result.id)
+      this.settingTable = result;
+      this.onGetDataTable(result.id);
     })
   }
 
@@ -72,6 +91,7 @@ export class TablesDinamicComponent implements OnInit {
   onAddItemTable ({ sender } : any) {
     this.closeEditor(sender);
     this.formGroup = new FormGroup(this.structureForm({}));
+    this.actionsDisabled = true;
     sender.addRow(this.formGroup);
   }
 
@@ -85,6 +105,7 @@ export class TablesDinamicComponent implements OnInit {
     this.closeEditor(sender);
     this.formGroup = new FormGroup(this.structureForm(dataItem));
     this.editedRowIndex = rowIndex;
+    this.actionsDisabled = true;
     sender.editRow(rowIndex, this.formGroup);
   }
 
@@ -99,12 +120,15 @@ export class TablesDinamicComponent implements OnInit {
 
   /**
    * Función para eliminar un registro de la tabla
-   * @param dataItem
+   * @param status {boolean}
    */
-  onRemoveItemTable ({ dataItem }: any) {
-    this.tableDataService.remove(this.settingTable.id, dataItem.id).subscribe(result => {
-      this.onGetDataTable(this.settingTable.id);
-    })
+  onRemoveItemTable (status: boolean) {
+    if(status) {
+      this.tableDataService.remove(this.settingTable.id, this.dataItem.id).subscribe(result => {
+        this.onGetDataTable(this.settingTable.id);
+      })
+    }
+    this.dialogOpened = false;
   }
 
   /**
@@ -125,6 +149,7 @@ export class TablesDinamicComponent implements OnInit {
         this.onGetDataTable(this.settingTable.id);
       })
     }
+    this.actionsDisabled = false;
     sender.closeRow(rowIndex);
   }
 
@@ -136,8 +161,10 @@ export class TablesDinamicComponent implements OnInit {
    */
   private structureForm(data: any) {
     let formControl = Object();
+    let options = [];
     for (let column of this.settingTable.columns) {
-      formControl[column.header] = new FormControl(data[column.header]);
+      if (column.required) options.push(Validators.required);
+      formControl[column.header] = new FormControl(data[column.header],Validators.compose(options));
     }
     return  formControl;
   }
@@ -151,7 +178,8 @@ export class TablesDinamicComponent implements OnInit {
   private closeEditor(grid: any , rowIndex = this.editedRowIndex) {
     grid.closeRow(rowIndex);
     this.editedRowIndex = undefined;
-    this.formGroup = undefined;
+    this.formGroup = new FormGroup({});
+    this.actionsDisabled = false;
   }
 
 }

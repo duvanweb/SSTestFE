@@ -1,41 +1,71 @@
-<div class="!k-flex-row">
 
-  <!-- START COMPONENT LISTTABLES-->
-  <div class="!k-flex-col">
-    <app-list-tables (selectedChange)="onChangeSelected($event)"></app-list-tables>
-  </div>
-  <!-- END COMPONENT LISTTABLES-->
-
-  <!-- START TABLE DINAMIC-->
-  <div class="!k-flex-col">
-    <kendo-grid
-      [data]="dataTable"
-      (add)="onAddItemTable($event)"
-      (edit)="onEditItemTable($event)"
-      (cancel)="onCancelItemTable($event)"
-      (save)="onSaveItemTable($event)"
-      (remove)="onRemoveItemTable($event)"
-    >
-      <ng-template kendoGridToolbarTemplate>
-        <button kendoGridAddCommand>Agregar</button>
-      </ng-template>
-        <kendo-grid-column *ngFor="let column of settingTable.columns"
-                           field="{{ column.header }}"
-                           title="{{ column.header }}"
-        ></kendo-grid-column>
-      <kendo-grid-command-column title="Acciones" [width]="220">
-        <ng-template kendoGridCellTemplate let-isNew="isNew">
-          <button kendoGridEditCommand [primary]="true">Editar</button>
-          <button kendoGridRemoveCommand>Eliminar</button>
-          <button kendoGridSaveCommand >
-            {{ isNew ? "Guardar" : "Actualizar" }}
-          </button>
-          <button kendoGridCancelCommand>
-            {{ isNew ? "Cacelar" : "Cacelar" }}
-          </button>
-        </ng-template>
-      </kendo-grid-command-column>
-    </kendo-grid>
-  </div>
+<div class="demo">
   <!-- END TABLE DINAMIC-->
+  <kendo-card width="315px" height="1200px" orientation="vertical">
+    <kendo-card-header class="k-hstack">
+      <h5 kendoCardTitle>Configuración: </h5>
+    </kendo-card-header>
+    <kendo-card-body>
+      <!-- START COMPONENT LISTTABLES-->
+        <app-list-tables (selectedChange)="onChangeSelected($event)"></app-list-tables>
+      <!-- END COMPONENT LISTTABLES-->
+    </kendo-card-body>
+  </kendo-card>
+  <kendo-card width="1200px" height="1200px"  orientation="vertical">
+    <kendo-card-header class="k-hstack">
+      <h5 kendoCardTitle>Datos: </h5>
+    </kendo-card-header>
+    <kendo-card-body>
+      <!-- START COMPONENT LISTTABLES-->
+        <kendo-grid
+          [data]="dataTable"
+          (add)="onAddItemTable($event)"
+          (edit)="onEditItemTable($event)"
+          (cancel)="onCancelItemTable($event)"
+          (save)="onSaveItemTable($event)"
+          (remove)="onOpenDialog($event)"
+        >
+          <ng-template kendoGridToolbarTemplate>
+            <button kendoGridAddCommand  [disabled]="actionsDisabled" >Nuevo</button>
+          </ng-template>
+          <kendo-grid-column *ngFor="let column of settingTable.columns"
+                             field="{{ column.header }}"
+                             title="{{ column.header }}"
+                             [editor]="column.dataType==='text' ? 'text' : column.dataType==='numeric' ? 'numeric' : 'date' "
+          ></kendo-grid-column>
+          <kendo-grid-command-column title="Acciones" [width]="220">
+            <ng-template kendoGridCellTemplate let-isNew="isNew">
+              <button kendoGridEditCommand [primary]="true" [disabled]="actionsDisabled">Editar</button>
+              <button kendoGridRemoveCommand  [disabled]="actionsDisabled">Eliminar</button>
+              <button kendoGridSaveCommand [disabled]=" (formGroup?.invalid == true ) ? true : false">
+                {{ isNew ? "Guardar" : "Actualizar" }}
+              </button>
+              <button kendoGridCancelCommand>
+                {{ isNew ? "Cacelar" : "Cacelar" }}
+              </button>
+            </ng-template>
+          </kendo-grid-command-column>
+        </kendo-grid>
+      <!-- END COMPONENT LISTTABLES-->
+    </kendo-card-body>
+  </kendo-card>
 </div>
+<!-- START COMPONENT DIALOG -->
+<kendo-dialog
+  title="Confirmar"
+  *ngIf="dialogOpened"
+  (close)="onCloseDialog()"
+  [minWidth]="250"
+  [width]="450"
+>
+  <p style="margin: 30px; text-align: center;">
+    ¿Desea eliminar el registro?
+  </p>
+  <kendo-dialog-actions>
+    <button kendoButton (click)="onRemoveItemTable(false)">No</button>
+    <button kendoButton (click)="onRemoveItemTable(true)" themeColor="primary">
+      Si
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>
+<!-- END COMPONENT DIALOG -->
